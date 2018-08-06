@@ -1,6 +1,9 @@
 'use strict'
 
 import { app, ipcMain, BrowserWindow } from 'electron'
+var sqlite = require('./SqliteControlloer')
+// const fs = require('fs')
+// const sqlite3 = require('sqlite3').verbose()
 
 /**
  * Set `__static` path to static files in production
@@ -26,7 +29,6 @@ function createWindow () {
   })
 
   mainWindow.loadURL(winURL)
-  mainWindow.webContents.send('pong', 'Hello World!')
   mainWindow.on('closed', () => {
     mainWindow = null
   })
@@ -46,8 +48,15 @@ app.on('activate', () => {
   }
 })
 
+ipcMain.on('get-tables', (event, arg) => {
+  var tables = sqlite.getTables()
+  event.sender.send('get-tables', tables)
+  // db.close()
+})
+
 ipcMain.on('asynchronous-message', (event, arg) => {
   console.log(arg) // prints "ping"
+
   event.sender.send('asynchronous-reply', 'pong')
 })
 
